@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:app5/Global.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app5/pages/homePageMethod.dart';
 import 'package:app5/shared/getUserData.dart';
@@ -26,6 +27,7 @@ class _NeedServeState extends State<NeedServe> {
   final TextEditingController numberOfPeopleController = TextEditingController();
   final TextEditingController categoryController = TextEditingController(); // New controller for category
   List<QueryDocumentSnapshot> data = [];
+  String? _selectedCategory; // Make _selectedCategory a member variable
 
   getData() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -94,7 +96,6 @@ class _NeedServeState extends State<NeedServe> {
       );
       return;
     }
-    String? _selectedCategory;
 
     Uint8List image = await downloadImageData(data[0]['imageLink']);
 
@@ -233,40 +234,40 @@ class _NeedServeState extends State<NeedServe> {
                       ),
                       Divider(),
                       Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: Container(
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  items: categories.map((String category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          BorderSide(color: Color.fromARGB(255, 95, 94, 94)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade900),
-                    ),
-                  ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedCategory = newValue;
-                    });
-                  },
-                  hint: Text('Select Category'),
-                  isExpanded: true,
-                ),
-              ),
-            ),
+                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                        child: Container(
+                          decoration:
+                              BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedCategory,
+                            items: categories.map((String category) {
+                              return DropdownMenuItem<String>(
+                                value: category,
+                                child: Text(category),
+                              );
+                            }).toList(),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    BorderSide(color: Color.fromARGB(255, 95, 94, 94)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey.shade900),
+                              ),
+                            ),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedCategory = newValue;
+                              });
+                            },
+                            hint: Text('Select Category'),
+                            isExpanded: true,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

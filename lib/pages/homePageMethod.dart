@@ -325,31 +325,6 @@ class _HomePageState extends State<homePage> {
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        allWrokers() //here pass the actual values of these variables, for example false if the payment isn't successfull..etc
-                                    ),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 25.0, vertical: 10),
-                              child: Container(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  'voir tout',
-                                  style: TextStyle(
-                                      color: Color.fromARGB(221, 34, 107, 153),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                       Padding(
@@ -359,7 +334,7 @@ class _HomePageState extends State<homePage> {
                         child: Container(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Ces gens travaillent si dur que nous vous le recommandons  ',
+                            'Ces gens sont competant nous les recommandons ',
                             style: TextStyle(
                                 color: const Color.fromARGB(221, 79, 78, 78),
                                 fontSize: 16,
@@ -472,7 +447,7 @@ class _HomePageState extends State<homePage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
-                          'Naie pas peur, on fait confiance à ce peuple ',
+                          '    ',
                           style: TextStyle(
                               color: const Color.fromARGB(221, 79, 78, 78),
                               fontSize: 16,
@@ -579,6 +554,7 @@ class _HomePageState extends State<homePage> {
     );
   }
 }
+
 // this for the search
 class CostumSearch extends SearchDelegate {
   BuildContext context;

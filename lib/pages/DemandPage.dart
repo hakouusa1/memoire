@@ -1,3 +1,4 @@
+import 'package:app5/pages/BottomNavigationBarExampleApp.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -89,7 +90,7 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
     }
   }
 
-  void updateAcceptedValue() async {
+  Future<void> updateAcceptedValue() async {
     try {
       await FirebaseFirestore.instance
           .collection('user')
@@ -246,7 +247,7 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
                     link = value;
                   },
                   decoration: InputDecoration(
-                    labelText: 'Link',
+                    labelText: 'Localisation',
                   ),
                 ),
                 TextField(
@@ -270,7 +271,7 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
                     phone = value;
                   },
                   decoration: InputDecoration(
-                    labelText: 'Phone',
+                    labelText: 'Telephone',
                   ),
                 ),
               ],
@@ -288,6 +289,14 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await _acceptDemand(context, link, message, date, phone);
+                if (mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => Bottom(),
+                    ),
+                  );
+                }
               },
             ),
           ],
@@ -324,10 +333,10 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
 
       await documentReference.update({'accepted': true});
 
-      updateAcceptedValue();
+      await updateAcceptedValue();
 
-      sendPushMessage('You have an accepted demand', "You have everything",
-          "knflkajflkajlkfjalfjla");
+      await sendPushMessage('You have an accepted demand',
+          "You have everything", "knflkajflkajlkfjalfjla");
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Demand accepted and uploaded successfully')),
@@ -360,6 +369,17 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
   Future<void> sendPushMessage(String title, String body, String id) async {
     String? serverToken = await FirebaseMessaging.instance.getToken();
 
+    if (serverToken == null) {
+      print('Error: Unable to get FCM server token.');
+      return;
+    }
+
+    String? userToken = await getTokenUser(widget.idSender);
+    if (userToken == null) {
+      print('Error: Unable to get user token.');
+      return;
+    }
+
     await http.post(
       Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: <String, String>{
@@ -378,7 +398,7 @@ class _DemandDetailsPageState extends State<DemandDetailsPage> {
             'id': '1',
             'status': 'done'
           },
-          'to': await getTokenUser(widget.idSender),
+          'to': userToken,
         },
       ),
     );

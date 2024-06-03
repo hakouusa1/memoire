@@ -2,6 +2,7 @@ import 'package:app5/shared/workerPost.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+
 class Worker extends StatelessWidget {
   final WorkerItem works;
   const Worker(WorkerItem work, {Key? key, required this.works})
@@ -10,7 +11,7 @@ class Worker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
+      width: 206,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Color.fromARGB(255, 86, 86, 86)),
@@ -21,12 +22,12 @@ class Worker extends StatelessWidget {
         children: [
           Container(
             width: double.infinity,
-
             height: 170,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: NetworkImage(works.ImagePath ?? "assets/images/logo4.png"),
+                image:
+                    NetworkImage(works.ImagePath ?? "assets/images/logo4.png"),
                 fit: BoxFit.cover,
               ),
             ),
@@ -82,7 +83,6 @@ class Worker extends StatelessWidget {
                       ),
                     ),
                   ],
-
                 ),
               ],
             ),

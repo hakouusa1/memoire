@@ -300,8 +300,7 @@ class _OffersPageState extends State<OffersPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DemandDetailsPage(
-                        varr: "offers",
+                      builder: (context) => Offerdetailpage(
                         idPost: offer.id,
                         id: widget.user,
                         name: offer['firstName'],
@@ -309,7 +308,6 @@ class _OffersPageState extends State<OffersPage> {
                         information: offer['moreInfo'],
                         location: offer['location'],
                         phone: offer['phoneNumber'],
-                        idSender: offer['idSender'],
                       ),
                     ),
                   );

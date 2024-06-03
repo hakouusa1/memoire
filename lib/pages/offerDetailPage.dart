@@ -57,7 +57,6 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,6 +150,7 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
         if (isAccepted)
           ElevatedButton.icon(
             onPressed: () async {
+              await _removeAcceptedDemand();
             },
             icon: Icon(Icons.remove_circle),
             label: Text('Remove'),
@@ -291,5 +291,45 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
     }
   }
 
-  
+  Future<void> _removeAcceptedDemand() async {
+    try {
+      CollectionReference acceptedDemands = FirebaseFirestore.instance
+          .collection('user')
+          .doc(widget.id)
+          .collection('acceptedDemandes');
+
+      QuerySnapshot querySnapshot = await acceptedDemands
+          .where('name', isEqualTo: data[0]['name'])
+          .where('location', isEqualTo: widget.location)
+          .where('phone', isEqualTo: widget.phone)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      await FirebaseFirestore.instance
+          .collection('post')
+          .doc(widget.idPost)
+          .update({
+        'number': FieldValue.increment(1),
+      });
+
+      if (mounted) {
+        setState(() {
+          isAccepted = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Accepted demand removed successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove the accepted demand: $e')),
+        );
+      }
+    }
+  }
 }
