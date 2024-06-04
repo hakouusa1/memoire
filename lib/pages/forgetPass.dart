@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Forget extends StatefulWidget {
-   Forget({Key? key}) : super(key: key);
+  Forget({Key? key}) : super(key: key);
 
   @override
   State<Forget> createState() => _ForgetState();
@@ -13,22 +13,21 @@ class _ForgetState extends State<Forget> {
   final emailControler = TextEditingController();
 
   @override
-  void dispose(){
+  void dispose() {
     emailControler.dispose();
     super.dispose();
-
   }
 
-  Future ForgetButton() async{
-
+  Future ForgetButton() async {
     showDialog(
       context: context,
       builder: (context) => Center(
         child: CircularProgressIndicator(),
       ),
     );
-    try{
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailControler.text.trim());
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailControler.text.trim());
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -47,8 +46,7 @@ class _ForgetState extends State<Forget> {
           );
         },
       );
-
-    }on FirebaseAuthException catch(e){
+    } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -68,7 +66,6 @@ class _ForgetState extends State<Forget> {
         },
       );
     }
-
   }
 
   @override
@@ -77,15 +74,20 @@ class _ForgetState extends State<Forget> {
       appBar: AppBar(
         leading: IconButton(
             padding: EdgeInsets.symmetric(horizontal: 30),
-            icon: Icon(Icons.arrow_back_ios , color: Colors.white,),
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            ),
             onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Login()));
+              Navigator.pop(context);
             }),
-        title: Text('Forgot Password' , style: TextStyle(color: Colors.white),),
-        backgroundColor: Color.fromARGB(255, 57, 111, 132), // Your app's theme color
+        title: Text(
+          'Forgot Password',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor:
+            Color.fromARGB(255, 57, 111, 132), // Your app's theme color
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -96,7 +98,8 @@ class _ForgetState extends State<Forget> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 57, 111, 132), // Your app's primary color
+                color: Color.fromARGB(
+                    255, 57, 111, 132), // Your app's primary color
               ),
             ),
             SizedBox(height: 20),
@@ -118,11 +121,14 @@ class _ForgetState extends State<Forget> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-
               onPressed: ForgetButton,
-              child: Text('Send Reset Email' , style: TextStyle(color: Colors.white),),
+              child: Text(
+                'Send Reset Email',
+                style: TextStyle(color: Colors.white),
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 57, 111, 132), // Your app's primary color
+                backgroundColor: Color.fromARGB(
+                    255, 57, 111, 132), // Your app's primary color
               ),
             ),
           ],

@@ -353,10 +353,8 @@ class _CommetpageState extends State<Commetpage> {
     try {
       // Get the current user ID
       String userId = FirebaseAuth.instance.currentUser!.uid;
-
       // Get the current date and time
       String currentDate = DateTime.now().toIso8601String();
-
       // Add the comment to Firestore
       await FirebaseFirestore.instance
           .collection('post')

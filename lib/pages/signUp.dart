@@ -71,18 +71,16 @@ class _SignupState extends State<signup> {
         Navigator.pop(context);
         final user = FirebaseAuth.instance.currentUser;
         if (user != null && user.emailVerified) {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Bottom()));
+          return;
         } else {
           user?.sendEmailVerification();
-
           String name = usernameController.text;
           String email = emailController.text;
           String password = passwordController.text;
           // Check if _imageFiles is not empty and its first element is not null
           Uint8List? imageBytes =
               _imageFiles.isNotEmpty ? _imageFiles[0] : null;
-          if (imageBytes != null) {
+          if (imageBytes != null && name.isNotEmpty && email.isNotEmpty && password.isNotEmpty ) {
             String resp = await StoreData().saveUserData(
               id: FirebaseAuth.instance.currentUser!.uid,
               cred: cred,
@@ -167,7 +165,6 @@ class _SignupState extends State<signup> {
       maxHeight: 800,
       maxWidth: 800, // Adjust image quality as needed
     );
-
     if (pickedFiles != null) {
       setState(() {
         _imageFiles = pickedFiles

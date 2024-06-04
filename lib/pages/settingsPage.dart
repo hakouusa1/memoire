@@ -2,6 +2,7 @@ import 'package:app5/pages/AboutUs.dart';
 import 'package:app5/pages/BottomNavigationBarExampleApp.dart';
 import 'package:app5/pages/FeedBack.dart';
 import 'package:app5/pages/accountCenter.dart';
+import 'package:app5/pages/forgetPass.dart';
 import 'package:app5/pages/login.dart';
 import 'package:app5/shared/setingSquar.dart'; // Ensure these paths are correct
 import 'package:app5/shared/textfield.dart'; // Ensure these paths are correct
@@ -67,7 +68,7 @@ class _SettingPageState extends State<SettingPage> {
                   "Reset Password",
                   "Personal details",
                   "https://th.bing.com/th/id/OIP.d1mA8cQaonu2li1wmMP9nAAAAA?rs=1&pid=ImgDetMain",
-                  null, // Add your password reset page here
+                  Forget(), // Add your password reset page here
                 ),
                 divider(),
                 sectionTitle("More Info and Support"),
@@ -86,7 +87,7 @@ class _SettingPageState extends State<SettingPage> {
                   AboutUsPage(),
                 ),
                 divider(),
-                sectionTitle("Login"),
+                sectionTitle("logout"),
                 logoutButton(),
                 SizedBox(height: 30),
               ],
@@ -189,8 +190,8 @@ class _SettingPageState extends State<SettingPage> {
           isLoading = true;
         });
         try {
-          
           await FirebaseAuth.instance.signOut();
+          bottomSelectedIndex = 0;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => Login()),

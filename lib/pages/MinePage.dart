@@ -301,8 +301,9 @@ class _OffersPageState extends State<OffersPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => Offerdetailpage(
-                        idPost: offer.id,
-                        id: widget.user,
+                        userId: widget.user,
+                        idPost: offer['realPostId'],
+                        id: offer.id,
                         name: offer['firstName'],
                         lastName: offer['lastName'],
                         information: offer['moreInfo'],

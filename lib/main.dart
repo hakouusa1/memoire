@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'firebase_options.dart';
+ 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 const String channelId = 'accepted_demand_channel';
@@ -25,9 +26,7 @@ Future<void> firebaseMessagingBackGroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackGroundHandler);
-
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
@@ -91,51 +90,6 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
-    );
-  }
-}
-
-class FirstApp extends StatelessWidget {
-  const FirstApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 238, 234, 234),
-        title: const Text("NeedServe"),
-        elevation: 20,
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.menu_open,
-            size: 33,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.search,
-              size: 10,
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.account_circle,
-              size: 33,
-            ),
-          )
-        ],
-      ),
-      body: const Center(
-        child: Text(
-          "Hello, yanis👋",
-          style: TextStyle(fontSize: 40),
-        ),
-      ),
     );
   }
 }

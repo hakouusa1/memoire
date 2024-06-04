@@ -14,7 +14,8 @@ class WorkerPage extends StatefulWidget {
   final String idWork;
   final int? a;
   final int? i;
-  WorkerPage({Key? key, required this.idWork, this.a, this.i}) : super(key: key);
+  WorkerPage({Key? key, required this.idWork, this.a, this.i})
+      : super(key: key);
 
   @override
   State<WorkerPage> createState() => _WorkerPageState();
@@ -95,11 +96,12 @@ class _WorkerPageState extends State<WorkerPage> {
                       SearchPage(title: dataOfWorks[0]['title']),
                 ),
               );
-            }else if(widget.a == 1){
+            } else if (widget.a == 1) {
               Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => CategorySingle(i: widget.i!)));
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          CategorySingle(i: widget.i!)));
             } else {
               Navigator.of(context).pop();
             }
@@ -116,7 +118,11 @@ class _WorkerPageState extends State<WorkerPage> {
   Widget buildContent() {
     if (dataOfWorks.isEmpty) {
       return Center(
-          child: Text("No data available", style: TextStyle(fontSize: 18)));
+        child: Text(
+          "No data available",
+          style: TextStyle(fontSize: 18),
+        ),
+      );
     }
 
     var currentData = dataOfWorks[0];
@@ -127,19 +133,51 @@ class _WorkerPageState extends State<WorkerPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.person, color: Colors.grey),
+                  SizedBox(width: 5),
+                  Text(
+                    currentData['name'] ?? 'Name not available',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
+              SizedBox(width: 15),
+              Row(
+                children: [
+                  Icon(Icons.location_on, color: Colors.grey),
+                  SizedBox(width: 5),
+                  Text(
+                    currentData['location'] ?? 'Location not available',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+          SizedBox(height: 20),
           buildImageSlider(imageLinks),
           SizedBox(height: 20),
           buildThumbnailRow(imageLinks),
           SizedBox(height: 20),
-          Text(currentData['title'] ?? '',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          Text(
+            currentData['title'] ?? '',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
           SizedBox(height: 8),
-          Text(currentData['description'] ?? '',
-              style: TextStyle(fontSize: 16, color: Colors.grey[800])),
+          Text(
+            currentData['description'] ?? '',
+            style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+          ),
           SizedBox(height: 20),
           buildActionButtons(currentData),
           SizedBox(height: 20),
-          buildCommentSection(currentData.id), // Add comment section
+          buildCommentSection(currentData.id),
         ],
       ),
     );

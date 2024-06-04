@@ -65,9 +65,8 @@ class _PostsState extends State<posts> {
   Future<void> _toggleLike() async {
     final user = auth.currentUser;
     if (user != null) {
-      final docRef = FirebaseFirestore.instance
-          .collection('post')
-          .doc(widget.idPost);
+      final docRef =
+          FirebaseFirestore.instance.collection('post').doc(widget.idPost);
 
       if (isLiked) {
         // Remove like
@@ -103,13 +102,13 @@ class _PostsState extends State<posts> {
     // Calculate time ago
     if (difference.inDays > 0) {
       timeAgo =
-      '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
+          '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
     } else if (difference.inHours > 0) {
       timeAgo =
-      '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
+          '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
     } else if (difference.inMinutes > 0) {
       timeAgo =
-      '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
+          '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
     } else {
       timeAgo = 'Just now';
     }
@@ -121,7 +120,8 @@ class _PostsState extends State<posts> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
               backgroundImage: Image.network(widget.path).image,
             ),
@@ -227,24 +227,31 @@ class _PostsState extends State<posts> {
                 },
                 icon: const Icon(Icons.comment_outlined),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Setdemandpage(
-                        postId: widget.id,
-                        realIdPost: widget.idPost,
+              widget.numberOfPersons == 0
+                  ? Text(
+                      "Offre Expired",
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 79, 79, 79), fontSize: 18),
+                    )
+                  : GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Setdemandpage(
+                              postId: widget.id,
+                              realIdPost: widget.idPost,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "send OFFRE",
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 12, 95, 178),
+                            fontSize: 18),
                       ),
-                    ),
-                  );
-                },
-                child: const Text(
-                  "send OFFRE",
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 12, 95, 178), fontSize: 18),
-                ),
-              )
+                    )
             ],
           ),
           const SizedBox(

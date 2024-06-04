@@ -1,13 +1,37 @@
+import 'package:app5/pages/accountPage.dart';
 import 'package:app5/pages/settingsPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-class AccountCenterPage extends StatelessWidget {
-  // Replace these variables with actual user data
-  String userEmail = 'user@example.com';
-  final String userName = 'John Doe';
-  final String userBio =
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce gravida turpis non elit volutpat, sit amet eleifend metus tristique.';
-  final String userPhoneNumber = '+1234567890';
+class AccountCenterPage extends StatefulWidget {
+  @override
+  State<AccountCenterPage> createState() => _AccountCenterPageState();
+}
+
+class _AccountCenterPageState extends State<AccountCenterPage> {
+  List<QueryDocumentSnapshot> data = [];
+  final FirebaseAuth auth = FirebaseAuth.instance; // Ensure auth is initialized
+
+  Future<void> getData() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .where('id', isEqualTo: auth.currentUser!.uid)
+          .get();
+      data.addAll(querySnapshot.docs);
+      setState(() {});
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,98 +63,42 @@ class AccountCenterPage extends StatelessWidget {
                 ),
               ),
               subtitle: Text(
-                userEmail,
+                auth.currentUser!.email!,
                 style: TextStyle(
                   fontSize: 16,
                 ),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  // Handle the edit email action
-                  _changeEmail(context);
-                },
               ),
             ),
             SizedBox(height: 20),
-            ListTile(
-              title: Text(
-                'Name:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            // Check if data is not empty before accessing its elements
+            if (data.isNotEmpty)
+              ListTile(
+                title: Text(
+                  'Name:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              subtitle: Text(
-                userName,
-                style: TextStyle(
-                  fontSize: 16,
+                subtitle: Text(
+                  data[0].get('name') ?? 'Unknown',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  // Handle the edit name action
-                },
-              ),
-            ),
-            SizedBox(height: 20),
-            ListTile(
-              title: Text(
-                'Bio:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text(
-                userBio,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  // Handle the edit bio action
-                },
-              ),
-            ),
-            SizedBox(height: 20),
-            ListTile(
-              title: Text(
-                'Phone Number:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text(
-                userPhoneNumber,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  // Handle the edit phone number action
-                },
-              ),
-            ),
+              )
+            else
+              CircularProgressIndicator(), // Show loading indicator if data is still being fetched
           ],
         ),
       ),
     );
   }
 
-  // Function to handle changing email
   void _changeEmail(BuildContext context) {
-    // Implement email change logic here
     showDialog(
       context: context,
       builder: (context) {
-        // Add your dialog UI for changing email
         return AlertDialog(
           title: Text('Change Email'),
           content: Text(
@@ -138,17 +106,12 @@ class AccountCenterPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                // Implement the logic to update the email
-                // For example:
-                // userEmail = newText;
-                // Then, close the dialog
                 Navigator.of(context).pop();
               },
               child: Text('Submit'),
             ),
             TextButton(
               onPressed: () {
-                // Close the dialog without updating the email
                 Navigator.of(context).pop();
               },
               child: Text('Cancel'),

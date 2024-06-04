@@ -1,3 +1,5 @@
+import 'package:app5/pages/BottomNavigationBarExampleApp.dart';
+import 'package:app5/pages/accountPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,6 +12,7 @@ class Offerdetailpage extends StatefulWidget {
   final String phone;
   final String id;
   final String idPost;
+  final String userId;
 
   Offerdetailpage({
     required this.name,
@@ -19,6 +22,7 @@ class Offerdetailpage extends StatefulWidget {
     required this.location,
     required this.phone,
     required this.idPost,
+    required this.userId,
   });
 
   @override
@@ -38,22 +42,39 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
 
   Future<void> getData() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('user')
-          .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .doc(widget.userId) // Use userId instead of currentUser uid
+          .collection('offers')
+          .doc(widget.id)
           .get();
-      if (querySnapshot.docs.isNotEmpty) {
-        data.addAll(querySnapshot.docs);
-      }
-      if (mounted) {
-        setState(() {});
+
+      if (snapshot.exists) {
+        // Check if the document exists
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        setState(() {
+          // Update isAccepted based on the value from Firestore
+          isAccepted = data['accepted'] ??
+              false; // If accepted is not present, default to false
+        });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting data: $e')),
-        );
-      }
+      print('Error getting data: $e');
+      // Handle the error, e.g., show a snackbar
+    }
+  }
+
+  List<QueryDocumentSnapshot> dataUser = [];
+  Future<void> getDataUser() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .where('id', isEqualTo: auth.currentUser!.uid)
+          .get();
+      data.addAll(querySnapshot.docs);
+      setState(() {});
+    } catch (e) {
+      print('Error fetching user data: $e');
     }
   }
 
@@ -133,8 +154,7 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
           ),
-        if (!isAccepted && !isRefused)
-          SizedBox(width: 20),
+        if (!isAccepted && !isRefused) SizedBox(width: 20),
         if (!isAccepted && !isRefused)
           ElevatedButton.icon(
             onPressed: () async {
@@ -222,7 +242,7 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
             ElevatedButton(
               child: Text('Submit'),
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
                 await _acceptDemand(link, message, date, phone);
               },
             ),
@@ -232,7 +252,8 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
     );
   }
 
-  Future<void> _acceptDemand(String link, String message, String date, String phone) async {
+  Future<void> _acceptDemand(
+      String link, String message, String date, String phone) async {
     try {
       if (data.isEmpty) {
         throw Exception("User data not available.");
@@ -240,13 +261,13 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
 
       CollectionReference acceptedDemands = FirebaseFirestore.instance
           .collection('user')
-          .doc(widget.id)
+          .doc(widget.userId)
           .collection('acceptedDemandes');
 
       DateTime parsedDate = DateTime.parse(date);
 
       await acceptedDemands.add({
-        'name': data[0]['name'],
+        'name': dataUser[0]['name'],
         'location': link,
         'phone': phone,
         'message': message,
@@ -254,11 +275,15 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
+      decrementNumberInPostCollection(widget.idPost);
+
       await FirebaseFirestore.instance
-          .collection('post')
-          .doc(widget.idPost)
+          .collection('user')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('offers')
+          .doc(widget.id)
           .update({
-        'number': FieldValue.increment(-1),
+        'accepted': true,
       });
 
       if (mounted) {
@@ -271,6 +296,7 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
         );
       }
     } catch (e) {
+      print(e); // Add this line to print the exception details
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to accept the demand: $e')),
@@ -295,7 +321,7 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
     try {
       CollectionReference acceptedDemands = FirebaseFirestore.instance
           .collection('user')
-          .doc(widget.id)
+          .doc(widget.userId)
           .collection('acceptedDemandes');
 
       QuerySnapshot querySnapshot = await acceptedDemands
@@ -315,6 +341,15 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
         'number': FieldValue.increment(1),
       });
 
+      await FirebaseFirestore.instance
+          .collection('user')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('offers')
+          .doc(widget.id)
+          .update({
+        'accepted': false,
+      });
+
       if (mounted) {
         setState(() {
           isAccepted = false;
@@ -331,5 +366,13 @@ class _OfferdetailpageState extends State<Offerdetailpage> {
         );
       }
     }
+  }
+
+  Future<void> decrementNumberInPostCollection(String postId) async {
+    final CollectionReference postsRef =
+        FirebaseFirestore.instance.collection('post');
+
+    // Assuming 'number' is the field you want to decrement
+    await postsRef.doc(postId).update({'number': FieldValue.increment(-1)});
   }
 }

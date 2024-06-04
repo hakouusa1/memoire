@@ -65,7 +65,7 @@ class _NeedServeState extends State<AddServe> {
     String description = DescriptionController.text;
     String phone = PhoneController.text;
     String title = TitleControler.text;
-    String price = PriceControler.text;
+    int price = PriceControler.text as int;
     String location = _locationController.text;
     // Check if _imageFiles is not empty and its first element is not null
     Uint8List? imageBytes = _imageFiles.isNotEmpty ? _imageFiles[0] : null;
@@ -84,6 +84,7 @@ class _NeedServeState extends State<AddServe> {
 
       // Handle successful data saving (e.g., show success message)
       Navigator.pop(context); // Dismiss the progress indicator
+      bottomSelectedIndex = 0;
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Bottom()));
       showDialog(

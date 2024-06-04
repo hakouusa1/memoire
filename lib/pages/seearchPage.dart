@@ -1,4 +1,5 @@
 import 'package:app5/pages/BottomNavigationBarExampleApp.dart';
+import 'package:app5/pages/homePageMethod.dart';
 import 'package:app5/pages/workerPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,8 +8,6 @@ import 'package:app5/shared/posts.dart';
 import 'package:app5/shared/worker.dart';
 import 'package:app5/shared/workerPost.dart';
 import 'package:app5/Global.dart';
-
-import 'homePageMethod.dart';
 
 class SearchPage extends StatefulWidget {
   final String title;
@@ -22,11 +21,12 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   String currentPage = 'ALL';
   List<QueryDocumentSnapshot> dataOfWorks = [];
+  List<QueryDocumentSnapshot> filteredDataOfWorks = [];
   List<QueryDocumentSnapshot> dataOfPosts = [];
   bool isLoading = true;
   String? selectedLocation;
-  double minPrice = 0;
-  double maxPrice = 1000;
+  int minPrice = 0; // Change to int
+  int maxPrice = 100000;
 
   @override
   void initState() {
@@ -72,7 +72,8 @@ class _SearchPageState extends State<SearchPage> {
           .where('title', isGreaterThanOrEqualTo: widget.title)
           .where('title', isLessThanOrEqualTo: widget.title + '\uf8ff')
           .get();
-      dataOfWorks = querySnapshot.docs; // Update dataOfWorks directly
+      dataOfWorks = querySnapshot.docs;
+      applyFilters(); // Update dataOfWorks directly
     } catch (e) {
       print('Error fetching works: $e');
     }
@@ -81,27 +82,14 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  Future<void> getDataFilterWork() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      Query query = FirebaseFirestore.instance
-          .collection('work')
-          .where('title', isGreaterThanOrEqualTo: widget.title)
-          .where('title', isLessThanOrEqualTo: widget.title + '\uf8ff')
-          .where('price', isGreaterThanOrEqualTo: minPrice)
-          .where('price', isLessThanOrEqualTo: maxPrice);
-
-      if (selectedLocation != null) {
-        query = query.where('location', isEqualTo: selectedLocation);
-      }
-
-      QuerySnapshot querySnapshot = await query.get();
-      dataOfWorks = querySnapshot.docs; // Update dataOfWorks directly
-    } catch (e) {
-      print('Error fetching works: $e');
-    }
+  void applyFilters() {
+    filteredDataOfWorks = dataOfWorks.where((doc) {
+      double price = doc['price'].toDouble();
+      bool matchesPrice = price >= minPrice && price <= maxPrice;
+      bool matchesLocation =
+          selectedLocation == null || doc['location'] == selectedLocation;
+      return matchesPrice && matchesLocation;
+    }).toList();
     setState(() {
       isLoading = false;
     });
@@ -207,14 +195,14 @@ class _SearchPageState extends State<SearchPage> {
                   Text('Min Price:'),
                   Expanded(
                     child: Slider(
-                      value: minPrice,
+                      value: minPrice.toDouble(),
                       min: 0,
-                      max: 100000,
-                      divisions: 100,
+                      max: 100000, // Adjusted max value
+                      divisions: 1000,
                       label: minPrice.round().toString(),
                       onChanged: (double value) {
                         setState(() {
-                          minPrice = value;
+                          minPrice = value.toInt();
                         });
                       },
                     ),
@@ -227,14 +215,14 @@ class _SearchPageState extends State<SearchPage> {
                   Text('Max Price:'),
                   Expanded(
                     child: Slider(
-                      value: maxPrice,
+                      value: maxPrice.toDouble(),
                       min: 0,
-                      max: 1000,
-                      divisions: 100,
+                      max: 100000, // Adjusted max value
+                      divisions: 1000,
                       label: maxPrice.round().toString(),
                       onChanged: (double value) {
                         setState(() {
-                          maxPrice = value;
+                          maxPrice = value.toInt();
                         });
                       },
                     ),
@@ -244,7 +232,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  getDataFilterWork();
+                  applyFilters();
                   Navigator.pop(context);
                 },
                 child: Text('Apply Filters'),
@@ -311,8 +299,8 @@ class _SearchPageState extends State<SearchPage> {
             _buildCategoryButton('ALL'),
             SizedBox(
               width: 10,
-              ),
-              _buildCategoryButton('Posts'),
+            ),
+            _buildCategoryButton('Posts'),
           ],
         ),
         _buildCategoryButton('Filter'),

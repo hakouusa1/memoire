@@ -5,7 +5,7 @@ class WorkerItem {
   String location;
   String phone;
   String title;
-  String price;
+  int price;
   String ImagePath;
   String description;
   String category;

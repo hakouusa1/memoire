@@ -87,27 +87,26 @@ class _BottomState extends State<Bottom> {
   // Widget to build the page view for different tabs
   Widget buildPageView() {
     return PageView.builder(
-      
       physics: NeverScrollableScrollPhysics(),
       controller: pageController,
       onPageChanged: (index) {
         pageChanged(index);
       },
       itemCount: 4, // Total number of pages
-    itemBuilder: (context, index) {
-      switch (index) {
-        case 0:
-          return homePage();
-        case 1:
-          return addPage();
-        case 2:
-          return NotificationPage();
-        case 3:
-          return AccountPage();
-        default:
-          return Container(); // Return an empty container if index is out of range
-      }
-    },
+      itemBuilder: (context, index) {
+        switch (index) {
+          case 0:
+            return homePage();
+          case 1:
+            return addPage();
+          case 2:
+            return NotificationPage();
+          case 3:
+            return AccountPage();
+          default:
+            return Container(); // Return an empty container if index is out of range
+        }
+      },
     );
   }
 

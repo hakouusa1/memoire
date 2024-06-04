@@ -47,7 +47,7 @@ class StoreData {
           'name': name,
           'email': email,
           'password': password,
-          'imageLink': imageUrl
+          '': imageUrl
         });
         resp = "success";
       } else {
@@ -62,7 +62,7 @@ class StoreData {
   Future<String> saveWorkData({
     required String title,
     required String name,
-    required String price,
+    required int price,
     required String id,
     required String description,
     required String phone,
@@ -74,7 +74,6 @@ class StoreData {
       String workId = Uuid().v4();
       if (title.isNotEmpty &&
           name.isNotEmpty &&
-          price.isNotEmpty &&
           description.isNotEmpty &&
           phone.isNotEmpty &&
           category.isNotEmpty &&

@@ -178,17 +178,7 @@ class _HomePageState extends State<homePage> {
                               ),
                             ],
                           ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.menu,
-                                  size: 33,
-                                  color: Colors.white,
-                                )),
-                          ),
+                          
                         ],
                       ),
                       SizedBox(
@@ -372,10 +362,8 @@ class _HomePageState extends State<homePage> {
                                       final workData = dataOfWorks[i].data();
                                       final String title =
                                           dataOfWorks[i]['title'];
-                                      final String price =
-                                          dataOfWorks[i]['price'] != null
-                                              ? dataOfWorks[i]['price']
-                                              : "0";
+                                      final int price =
+                                          dataOfWorks[i]['price'] ;
                                       final String name =
                                           dataOfWorks[i]['name'];
                                       final String description =

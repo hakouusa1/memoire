@@ -11,9 +11,9 @@ import 'package:app5/Global.dart';
 
 class CategorySingle extends StatefulWidget {
   final int i;
-  
+
   int? a;
-  CategorySingle({super.key, required this.i , this.a});
+  CategorySingle({super.key, required this.i, this.a});
 
   @override
   _CategorySingleState createState() => _CategorySingleState();
@@ -23,8 +23,13 @@ class _CategorySingleState extends State<CategorySingle> {
   String currentCategory = 'ALL';
 
   List<QueryDocumentSnapshot> dataOfWorks = [];
+  List<QueryDocumentSnapshot> filteredDataOfWorks = [];
   List<QueryDocumentSnapshot> dataOfPosts = [];
   bool isLoading = true;
+
+  String? selectedLocation;
+  int minPrice = 0;
+  int maxPrice = 100000;
 
   @override
   void initState() {
@@ -34,21 +39,172 @@ class _CategorySingleState extends State<CategorySingle> {
   }
 
   getData() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('post').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('post')
+        .where('category', isEqualTo: categoriesData[widget.i]['name'])
+        .get();
+
     dataOfPosts = querySnapshot.docs;
     setState(() {});
   }
 
   getDataWorks() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('work')
-        .where('category', isEqualTo: categoriesData[widget.i]['name'])
-        .get();
-    dataOfWorks = querySnapshot.docs;
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('work')
+          .where('category', isEqualTo: categoriesData[widget.i]['name'])
+          .get();
+      dataOfWorks = querySnapshot.docs;
+      applyFilters();
+    } catch (e) {
+      print('Error fetching works: $e');
+    }
+  }
+
+  void applyFilters() {
+    filteredDataOfWorks = dataOfWorks.where((doc) {
+      int price = doc['price'];
+      bool matchesPrice = price >= minPrice && price <= maxPrice;
+      bool matchesLocation =
+          selectedLocation == null || doc['location'] == selectedLocation;
+      return matchesPrice && matchesLocation;
+    }).toList();
     setState(() {
       isLoading = false;
     });
+  }
+
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          height: 300,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Filter Options',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              DropdownButton<String>(
+                hint: Text('Select Location'),
+                value: selectedLocation,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedLocation = newValue;
+                  });
+                },
+                items: <String>[
+                  'Adrar',
+                  'Chlef',
+                  'Laghouat',
+                  'Oum El Bouaghi',
+                  'Batna',
+                  'Béjaïa',
+                  'Biskra',
+                  'Béchar',
+                  'Blida',
+                  'Bouira',
+                  'Tamanrasset',
+                  'Tébessa',
+                  'Tlemcen',
+                  'Tiaret',
+                  'Tizi Ouzou',
+                  'Algiers',
+                  'Djelfa',
+                  'Jijel',
+                  'Sétif',
+                  'Saïda',
+                  'Skikda',
+                  'Sidi Bel Abbès',
+                  'Annaba',
+                  'Guelma',
+                  'Constantine',
+                  'Médéa',
+                  'Mostaganem',
+                  'M\'Sila',
+                  'Mascara',
+                  'Ouargla',
+                  'Oran',
+                  'El Bayadh',
+                  'Illizi',
+                  'Bordj Bou Arréridj',
+                  'Boumerdès',
+                  'El Tarf',
+                  'Tindouf',
+                  'Tissemsilt',
+                  'El Oued',
+                  'Khenchela',
+                  'Souk Ahras',
+                  'Tipaza',
+                  'Mila',
+                  'Aïn Defla',
+                  'Naâma',
+                  'Aïn Témouchent',
+                  'Ghardaïa',
+                  'Relizane'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              Row(
+                children: [
+                  Text('Min Price:'),
+                  Expanded(
+                    child: Slider(
+                      value: minPrice.toDouble(),
+                      min: 0,
+                      max: 100000,
+                      divisions: 1000,
+                      label: minPrice.toString(),
+                      onChanged: (double value) {
+                        setState(() {
+                          minPrice = value.toInt();
+                        });
+                      },
+                    ),
+                  ),
+                  Text('\$${minPrice.toString()}'),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Max Price:'),
+                  Expanded(
+                    child: Slider(
+                      value: maxPrice.toDouble(),
+                      min: 0,
+                      max: 100000,
+                      divisions: 1000,
+                      label: maxPrice.toString(),
+                      onChanged: (double value) {
+                        setState(() {
+                          maxPrice = value.toInt();
+                        });
+                      },
+                    ),
+                  ),
+                  Text('\$${maxPrice.toString()}'),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  applyFilters();
+                  Navigator.pop(context);
+                },
+                child: Text('Apply Filters'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -62,14 +218,17 @@ class _CategorySingleState extends State<CategorySingle> {
             size: 20,
           ),
           onPressed: () {
-            if(widget.a == 0){
-              Navigator.push(context,
-                MaterialPageRoute(builder: (BuildContext context) => CategoriPage()));
-            }else{
-              Navigator.push(context,
-                MaterialPageRoute(builder: (BuildContext context) => Bottom()));
+            if (widget.a == 0) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => CategoriPage()));
+            } else {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Bottom()));
             }
-            
           },
         ),
         actions: [
@@ -113,7 +272,7 @@ class _CategorySingleState extends State<CategorySingle> {
               Column(
                 children: [
                   if (currentCategory == 'ALL')
-                    dataOfWorks.isEmpty
+                    filteredDataOfWorks.isEmpty
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -132,9 +291,10 @@ class _CategorySingleState extends State<CategorySingle> {
                         : ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
-                            itemCount: dataOfWorks.length,
+                            itemCount: filteredDataOfWorks.length,
                             itemBuilder: (context, i) {
-                              var imageLinks = dataOfWorks[i]['imageLinks'];
+                              var imageLinks =
+                                  filteredDataOfWorks[i]['imageLinks'];
                               var firstImage = (imageLinks != null &&
                                       imageLinks is List &&
                                       imageLinks.isNotEmpty)
@@ -149,14 +309,16 @@ class _CategorySingleState extends State<CategorySingle> {
                                         builder: (context) => WorkerPage(
                                               a: 1,
                                               i: widget.i,
-                                              idWork: dataOfWorks[i]['workId'],
+                                              idWork: filteredDataOfWorks[i]
+                                                  ['workId'],
                                             )),
                                   );
                                 },
                                 child: Post2(
-                                  price: dataOfWorks[i]['price'],
-                                  description: dataOfWorks[i]['description'],
-                                  userName: dataOfWorks[i]['name'],
+                                  price: filteredDataOfWorks[i]['price'],
+                                  description: filteredDataOfWorks[i]
+                                      ['description'],
+                                  userName: filteredDataOfWorks[i]['name'],
                                   imagePath: firstImage,
                                 ),
                               );
@@ -214,9 +376,13 @@ class _CategorySingleState extends State<CategorySingle> {
   Widget _buildCategoryButton(String category) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          currentCategory = category;
-        });
+        if (category == 'Filter') {
+          _showFilterSheet();
+        } else {
+          setState(() {
+            currentCategory = category;
+          });
+        }
       },
       child: Container(
         decoration: BoxDecoration(

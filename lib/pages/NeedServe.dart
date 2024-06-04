@@ -24,8 +24,10 @@ class NeedServe extends StatefulWidget {
 
 class _NeedServeState extends State<NeedServe> {
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController numberOfPeopleController = TextEditingController();
-  final TextEditingController categoryController = TextEditingController(); // New controller for category
+  final TextEditingController numberOfPeopleController =
+      TextEditingController();
+  final TextEditingController categoryController =
+      TextEditingController(); // New controller for category
   List<QueryDocumentSnapshot> data = [];
   String? _selectedCategory; // Make _selectedCategory a member variable
 
@@ -82,7 +84,8 @@ class _NeedServeState extends State<NeedServe> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Invalid Input'),
-            content: Text("Please enter a valid number for the number of people."),
+            content:
+                Text("Please enter a valid number for the number of people."),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -114,7 +117,8 @@ class _NeedServeState extends State<NeedServe> {
       print("Error saving post: $e");
     }
 
-    Navigator.pop(context);
+    Navigator.pop(context); // Dismiss the progress indicator
+    bottomSelectedIndex = 0;
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => Bottom()),
@@ -227,7 +231,8 @@ class _NeedServeState extends State<NeedServe> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Number of people you need?',
-                          hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+                          hintStyle:
+                              TextStyle(fontSize: 16, color: Colors.grey),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 10, vertical: 15),
                         ),
@@ -236,8 +241,8 @@ class _NeedServeState extends State<NeedServe> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 0.0),
                         child: Container(
-                          decoration:
-                              BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10)),
                           child: DropdownButtonFormField<String>(
                             value: _selectedCategory,
                             items: categories.map((String category) {
@@ -251,11 +256,12 @@ class _NeedServeState extends State<NeedServe> {
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    BorderSide(color: Color.fromARGB(255, 95, 94, 94)),
+                                borderSide: BorderSide(
+                                    color: Color.fromARGB(255, 95, 94, 94)),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey.shade900),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade900),
                               ),
                             ),
                             onChanged: (String? newValue) {
